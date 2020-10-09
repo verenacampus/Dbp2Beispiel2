@@ -19,23 +19,44 @@ public class StudentDaoImpl implements StudentDao {
     public boolean create(Student student) {
         if(student==null)
         return false;
+        if (student.getId() != null) {
+            return false;
+        }
         else
+            manager.getTransaction().begin();
+            manager.persist(student);
+            manager.getTransaction().commit();
             return true;
     }
 
     @Override
     public Student update(Student student) {
-        return null;
+        if(student == null || find(student.getId()) == null){
+            return null;
+        }
+        manager.getTransaction().begin();
+        Student updated = manager.merge(student);
+        manager.getTransaction().commit();
+        return updated;
     }
 
     @Override
     public void delete(Student student) {
-
+        if(student == null || find(student.getId()) == null) {
+            return;
+        }
+        manager.getTransaction().begin();
+        Student removed = manager.merge(student);
+        manager.remove(removed);
+        manager.getTransaction().commit();
     }
 
     @Override
     public Student find(Integer id) {
-        return null;
+        if (id == null){
+            return null;
+        }
+        return manager.find(Student.class, id);
     }
 
     @Override
